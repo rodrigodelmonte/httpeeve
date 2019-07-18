@@ -71,11 +71,10 @@ func categorizeRequestError(reqErr error) error {
 
 	switch specificErr := reqErr.(type) {
 	case net.Error:
-		if specificErr.Timeout() {
+		switch {
+		case specificErr.Timeout(), specificErr.Temporary():
 			return reqErr
-		} else if specificErr.Temporary() {
-			return reqErr
-		} else {
+		default:
 			return backoff.Permanent(reqErr)
 		}
 	default:

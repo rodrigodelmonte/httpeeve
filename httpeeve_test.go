@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/cenkalti/backoff"
-
 	"github.com/stretchr/testify/assert"
 )
 
