@@ -35,3 +35,13 @@ an instance of `"cenkalti/backoff".Backoff` and a `Conditioner`.
 
 In the example, the `Conditioner` determines that 5XX status codes can be retried, 2XXs are OK, and everything else 
 results in an unretriable error.
+
+This library also provides a helper function to see how many attempts a request took:
+
+```go
+resp, err := client.Do(req)
+if err != nil {
+    // something
+}
+fmt.Println(httpeeve.Attempts(resp))
+```
