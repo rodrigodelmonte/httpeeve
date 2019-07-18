@@ -108,7 +108,8 @@ func PermanentErrorf(msg string, values ...interface{}) (bool, error) {
 	return false, fmt.Errorf(msg, values...)
 }
 
-// NewDefaultBackoffClient5XX retries
+// NewDefaultBackoffClient5XX retries requests if they result in 5XXs and accepts them if they result in 2XXs.
+// If they are neither they return an error and retry no longer.
 func NewDefaultBackoffClient5XX(httpClient http.Client) Client {
 	return NewBackoffClient(httpClient, backoff.NewExponentialBackOff(), func(resp *http.Response) (bool, error) {
 		if resp.StatusCode >= 500 && resp.StatusCode < 600 {
