@@ -44,9 +44,9 @@ func TestRequestRetries(t *testing.T) {
 func TestRequestNoRetryOn200(t *testing.T) {
 	client := NewBackoffClient(http.Client{}, backoffer, func(resp *http.Response) (bool, error) {
 		if resp.StatusCode == 500 {
-			return true, errors.New("bad")
+			return RetriableError("bad")
 		}
-		return false, nil
+		return OK()
 	})
 
 	var requestCount int
@@ -67,9 +67,9 @@ func TestRequestNoRetryOn200(t *testing.T) {
 func TestRequestReturnsErrImmediately(t *testing.T) {
 	client := NewBackoffClient(http.Client{}, backoffer, func(resp *http.Response) (bool, error) {
 		if resp.StatusCode == 404 {
-			return false, errors.New("bad")
+			return PermanentError("bad")
 		}
-		return false, nil
+		return OK()
 	})
 
 	var requestCount int

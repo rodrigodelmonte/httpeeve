@@ -44,8 +44,6 @@ func NewBackoffClient(httpClient http.Client, backoffer backoff.BackOff, conditi
 				return categorizeRequestError(reqErr)
 			}
 
-			defer resp.Body.Close()
-
 			var shouldRetry bool
 			shouldRetry, reqErr = conditioner(resp)
 			if reqErr == nil {
