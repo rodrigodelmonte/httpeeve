@@ -1,8 +1,11 @@
 package httpeeve
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"strings"
@@ -36,9 +39,24 @@ func NewBackoffClient(httpClient http.Client, backoffer backoff.BackOff, conditi
 	return clientFunc(func(req *http.Request) (*http.Response, error) {
 		var resp *http.Response
 		var attempts int
+
+		getBody := func() io.ReadCloser { return nil }
+		if req.Body != nil {
+			bodyBytes, err := readBody(req.Body)
+			if err != nil {
+				return nil, err
+			}
+			getBody = func() io.ReadCloser {
+				return ioutil.NopCloser(bytes.NewReader(bodyBytes))
+			}
+		}
+
 		err := backoff.Retry(func() error {
 			attempts++
+
 			var reqErr error
+			req.Body = getBody() // so we can re-read the request body over again
+
 			resp, reqErr = httpClient.Do(req)
 			if reqErr != nil {
 				return categorizeRequestError(reqErr)
@@ -60,6 +78,10 @@ func NewBackoffClient(httpClient http.Client, backoffer backoff.BackOff, conditi
 		addAttemptsToRequest(resp, attempts)
 		return resp, err
 	})
+}
+
+func readBody(body io.ReadCloser) ([]byte, error) {
+	return ioutil.ReadAll(body)
 }
 
 func categorizeRequestError(reqErr error) error {
