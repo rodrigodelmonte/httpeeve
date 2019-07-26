@@ -128,5 +128,7 @@ func Attempts(resp *http.Response) int {
 }
 
 func addAttemptsToRequest(resp *http.Response, attempts int) {
-	resp.Request = resp.Request.WithContext(context.WithValue(resp.Request.Context(), contextKeyAttempts{}, attempts))
+	if resp != nil && resp.Request != nil && resp.Request.Context() != nil {
+		resp.Request = resp.Request.WithContext(context.WithValue(resp.Request.Context(), contextKeyAttempts{}, attempts))
+	}
 }
