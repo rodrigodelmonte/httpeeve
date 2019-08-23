@@ -7,7 +7,7 @@ and provides some helper functions.
 ## Installation
 
 ```sh
-go get github.com/motain/httpeeve
+go get github.com/Onefootball/httpeeve
 ```
 
 ## Usage
